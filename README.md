@@ -2,7 +2,7 @@
 ## 1. admin_accounts – 관리자 계정 테이블
 ```{sql}
 CREATE TABLE admin_accounts (
-    admin_accounts_id       VARCHAR(50) PRIMARY KEY,
+    admin_accounts_id       VARCHAR(63) PRIMARY KEY,
     admin_accounts_password       VARCHAR(255) NOT NULL,
     roles_id        INT NOT NULL,
     admin_accounts_created_at     DATE NOT NULL,
@@ -16,13 +16,13 @@ CREATE TABLE admin_accounts (
 ```{sql}
 CREATE TABLE roles (
     roles_id        INT PRIMARY KEY AUTO_INCREMENT,
-    roles_name      VARCHAR(50) UNIQUE NOT NULL,
-    roles_description    VARCHAR(250)
+    roles_name      VARCHAR(63) UNIQUE NOT NULL,
+    roles_description    VARCHAR(255)
 );
 ```
 + 예시
 ```{sql}
-INSERT INTO roles (role_name, description) VALUES
+INSERT INTO roles (roles_name, roles_description) VALUES
 ('일반유저', '게시글/댓글 작성 및 열람, 자신이 작성한 글/댓글 삭제, 타인의 글/댓글 신고'),
 ('관리자', '일반 로그 열람, 공지 작성 및 수정, 신고 처리, 유저 정보 수정'),
 ('운영자', '전체 로그 열람, 관리자 계정 관리, 강제 탈퇴, 권한 변경');
@@ -33,12 +33,12 @@ INSERT INTO roles (role_name, description) VALUES
 ```{sql}
 CREATE TABLE notices (
     notices_id      INT PRIMARY KEY AUTO_INCREMENT,
-    notices_title          VARCHAR(200) NOT NULL,
-    notices_author_id      VARCHAR(50) NOT NULL,
+    notices_title          VARCHAR(255) NOT NULL,
+    notices_author_id      VARCHAR(63) NOT NULL,
     notices_is_pinned      CHAR(1) DEFAULT 'N',
     notices_created_at     DATE NOT NULL,
     notices_view_count     INT DEFAULT 0,
-    notices_content        VARCHAR(2000),
+    notices_content        VARCHAR(2047),
     notices_file_path      VARCHAR(255),
     FOREIGN KEY (notices_author_id) REFERENCES admin_accounts(admin_accounts_id)
 );
@@ -49,11 +49,11 @@ CREATE TABLE notices (
 ```{sql}
 CREATE TABLE reports (
     reports_id         INT PRIMARY KEY AUTO_INCREMENT,
-    reports_reporter_id       VARCHAR(50) NOT NULL,
-    reports_reported_user_id  VARCHAR(50) NOT NULL,
-    reports_reason            VARCHAR(100),
+    reports_reporter_id       VARCHAR(63) NOT NULL,
+    reports_reported_user_id  VARCHAR(63) NOT NULL,
+    reports_reason            VARCHAR(127),
     reports_reported_at       DATETIME NOT NULL,
-    reports_detail            VARCHAR(2000),
+    reports_detail            VARCHAR(2047),
     reports_status            ENUM('완료', '보류', '미완료') DEFAULT '미완료'
 );
 ```
@@ -63,24 +63,24 @@ CREATE TABLE reports (
 ```{sql}
 CREATE TABLE activity_logs (
     activity_logs_id        INT PRIMARY KEY AUTO_INCREMENT,
-    user_id       VARCHAR(50) NOT NULL,
-    activity_logs_action_type   VARCHAR(50), -- 예: login, write_post, delete_comment 등
+    user_id       VARCHAR(63) NOT NULL,
+    activity_logs_action_type   VARCHAR(63), -- 예: login, write_post, delete_comment 등
     activity_logs_action_time   DATETIME NOT NULL,
     activity_logs_target_info   VARCHAR(255), -- 예: 게시글 ID 등
-    activity_logs_description   VARCHAR(250)
+    activity_logs_description   VARCHAR(255)
 );
 ```
-
++ `user_id`는 외래키
 
 ## 6. system_logs – 시스템 로그 테이블
 ```{sql}
 CREATE TABLE system_logs (
     system_logs_id        INT PRIMARY KEY AUTO_INCREMENT,
     system_logs_level     VARCHAR(10),   -- INFO, WARN, ERROR 등
-    system_logs_message       VARCHAR(250),
+    system_logs_message       VARCHAR(255),
     system_logs_occurred_at   DATETIME NOT NULL,
-    system_logs_admin_id      VARCHAR(50),
-    system_logs_stack_trace   VARCHAR(2000),   -- 애매하면 blob
+    system_logs_admin_id      VARCHAR(63),
+    system_logs_stack_trace   VARCHAR(2047),   -- 애매하면 blob
     FOREIGN KEY (system_logs_admin_id) REFERENCES admin_accounts(admin_accounts_id)
 );
 ```
@@ -90,11 +90,11 @@ CREATE TABLE system_logs (
 ```{sql}
 CREATE TABLE admin_actions (
     admin_actions_id     INT PRIMARY KEY AUTO_INCREMENT,
-    admin_actions_id      VARCHAR(50) NOT NULL,
-    admin_actions_type   VARCHAR(50),      -- 예: sanction_user, delete_notice
-    admin_actions_target_user   VARCHAR(50),      -- 행동 대상자 등
+    admin_actions_id      VARCHAR(63) NOT NULL,
+    admin_actions_type   VARCHAR(63),      -- 예: sanction_user, delete_notice
+    admin_actions_target_user   VARCHAR(63),      -- 행동 대상자 등
     admin_actions_time   DATETIME NOT NULL,
-    admin_actions_detail        VARCHAR(250),
+    admin_actions_detail        VARCHAR(255),
     FOREIGN KEY (admin_actions_id) REFERENCES admin_accounts(admin_accounts_id)
 );
 ```
@@ -104,14 +104,15 @@ CREATE TABLE admin_actions (
 ```{sql}
 CREATE TABLE sanctions (
     sanctions_id     INT PRIMARY KEY AUTO_INCREMENT,
-    user_id         VARCHAR(50) NOT NULL,
-    sanctions_type   VARCHAR(50),         -- 예: write_ban, login_block
+    user_id         VARCHAR(63) NOT NULL,
+    sanctions_type   VARCHAR(63),         -- 예: write_ban, login_block
     sanctions_start_date      DATETIME NOT NULL,
     sanctions_end_date        DATETIME,
-    sanctions_reason          VARCHAR(2000),
-    sanctions_issued_by       VARCHAR(50),         -- 관리자 ID
+    sanctions_reason          VARCHAR(2047),
+    sanctions_issued_by       VARCHAR(63),         -- 관리자 ID
     sanctions_created_at      DATETIME NOT NULL,
     FOREIGN KEY (sanctions_issued_by) REFERENCES admin_accounts(admin_accounts_id)
 );
 ```
 + 검색을 위해 신고 처리와 별개로 모든 제재 내역 저장
++ `user_id`는 외래키
