@@ -17,7 +17,7 @@ CREATE TABLE admin_accounts (
 CREATE TABLE roles (
     role_id        INT PRIMARY KEY AUTO_INCREMENT,
     role_name      VARCHAR(50) UNIQUE NOT NULL,
-    description    TEXT
+    description    VARCHAR(250)
 );
 ```
 + 예시
@@ -38,7 +38,7 @@ CREATE TABLE notices (
     is_pinned      CHAR(1) DEFAULT 'N',
     created_at     DATE NOT NULL,
     view_count     INT DEFAULT 0,
-    content        TEXT,
+    content        VARCHAR(2000),
     file_path      VARCHAR(255),
     FOREIGN KEY (author_id) REFERENCES admin_accounts(admin_id)
 );
@@ -53,7 +53,7 @@ CREATE TABLE reports (
     reported_user_id  VARCHAR(50) NOT NULL,
     reason            VARCHAR(100),
     reported_at       DATETIME NOT NULL,
-    detail            TEXT,
+    detail            VARCHAR(2000),
     status            ENUM('완료', '보류', '미완료') DEFAULT '미완료'
 );
 ```
@@ -67,7 +67,7 @@ CREATE TABLE activity_logs (
     action_type   VARCHAR(50), -- 예: login, write_post, delete_comment 등
     action_time   DATETIME NOT NULL,
     target_info   VARCHAR(255), -- 예: 게시글 ID 등
-    description   TEXT
+    description   VARCHAR(250)
 );
 ```
 
@@ -77,11 +77,11 @@ CREATE TABLE activity_logs (
 CREATE TABLE system_logs (
     log_id        INT PRIMARY KEY AUTO_INCREMENT,
     log_level     VARCHAR(10),   -- INFO, WARN, ERROR 등
-    message       TEXT,
+    message       VARCHAR(250),
     occurred_at   DATETIME NOT NULL,
     ip_address    VARCHAR(50),
     admin_id      VARCHAR(50),
-    stack_trace   TEXT,
+    stack_trace   VARCHAR(2000),   -- 애매하면 blob
     FOREIGN KEY (admin_id) REFERENCES admin_accounts(admin_id)
 );
 ```
@@ -93,9 +93,9 @@ CREATE TABLE admin_actions (
     action_id     INT PRIMARY KEY AUTO_INCREMENT,
     admin_id      VARCHAR(50) NOT NULL,
     action_type   VARCHAR(50),      -- 예: sanction_user, delete_notice
-    target_user   VARCHAR(50),      -- 제재 대상자 등
+    target_user   VARCHAR(50),      -- 행동 대상자 등
     action_time   DATETIME NOT NULL,
-    detail        TEXT,
+    detail        VARCHAR(250),
     FOREIGN KEY (admin_id) REFERENCES admin_accounts(admin_id)
 );
 ```
@@ -109,10 +109,13 @@ CREATE TABLE sanctions (
     sanction_type   VARCHAR(50),         -- 예: write_ban, login_block
     start_date      DATETIME NOT NULL,
     end_date        DATETIME,
-    reason          TEXT,
+    reason          VARCHAR(2000),
     issued_by       VARCHAR(50),         -- 관리자 ID
     created_at      DATETIME NOT NULL,
     FOREIGN KEY (issued_by) REFERENCES admin_accounts(admin_id)
 );
 ```
 + 검색을 위해 신고 처리와 별개로 모든 제재 내역 저장
+
+
+
