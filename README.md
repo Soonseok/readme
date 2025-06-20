@@ -6,7 +6,7 @@ CREATE TABLE admin_accounts (
     admin_accounts_password       VARCHAR(255) NOT NULL,
     roles_id        INT NOT NULL,
     admin_accounts_created_at     DATE NOT NULL,
-    FOREIGN KEY (roles_id) REFERENCES roles(role_id)
+    FOREIGN KEY (roles_id) REFERENCES roles(roles_id)
 );
 ```
 + `role_id`는 권한 종류 연결(FK)
