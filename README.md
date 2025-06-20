@@ -4,7 +4,7 @@
 CREATE TABLE admin_accounts (
     admin_accounts_id       VARCHAR(50) PRIMARY KEY,
     admin_accounts_password       VARCHAR(255) NOT NULL,
-    role_id        INT NOT NULL,
+    roles_id        INT NOT NULL,
     admin_accounts_created_at     DATE NOT NULL,
     FOREIGN KEY (roles_id) REFERENCES roles(role_id)
 );
