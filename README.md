@@ -90,7 +90,7 @@ CREATE TABLE system_logs (
 ```{sql}
 CREATE TABLE admin_actions (
     admin_actions_id     INT PRIMARY KEY AUTO_INCREMENT,
-    admin_actions_id      VARCHAR(63) NOT NULL,
+    admin_id      VARCHAR(63) NOT NULL,
     admin_actions_type   VARCHAR(63),      -- 예: sanction_user, delete_notice
     admin_actions_target_user   VARCHAR(63),      -- 행동 대상자 등
     admin_actions_time   DATETIME NOT NULL,
